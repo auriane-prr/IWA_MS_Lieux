@@ -1,13 +1,17 @@
 package org.example.iwa_ms_lieux.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.models.LocationPhoto;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
 import org.example.iwa_ms_lieux.repositories.LocationPhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.example.iwa_ms_lieux.repositories.EquipmentRepository;
+import org.example.iwa_ms_lieux.models.Equipment;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LocationService {
@@ -18,25 +22,92 @@ public class LocationService {
     @Autowired
     private LocationPhotoRepository locationPhotoRepository;
 
-    public List<LocationPhoto> getPhotosByLocation(Integer locationId) {
+    @Autowired
+    private EquipmentRepository equipmentRepository;
+
+    // Ajouter un nouveau lieu
+    public Location addLocation(Location location) {
+        return locationRepository.save(location);
+    }
+
+    // Ajouter un nouvel équipement
+    public Equipment addEquipment(Equipment equipment) {
+        return equipmentRepository.save(equipment);
+    }
+
+    // Supprimer un équipement
+    public void deleteEquipment(Integer equipmentId) {
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
+        equipmentRepository.delete(equipment);
+    }
+
+    // Lier un équipement à un lieu
+    public void linkEquipmentToLocation(Integer locationId, Integer equipmentId) {
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
+        location.getEquipments().add(equipment);
+        locationRepository.save(location);
+    }
+
+    // Délier un équipement d'un lieu
+    public void unlinkEquipmentFromLocation(Integer locationId, Integer equipmentId) {
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
+        location.getEquipments().remove(equipment);
+        locationRepository.save(location);
+    }
+
+    // Récupérer tous les équipements
+    public List<Equipment> getAllEquipments() {
+        return equipmentRepository.findAll();
+    }
+
+    // Récupérer les équipements pour un lieu donné
+    public List<Equipment> getEquipmentsByLocation(Integer locationId) {
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+        return List.copyOf(location.getEquipments());
+    }
+
+    // Récupérer les lieux pour un équipement donné
+    public List<Location> getLocationsByEquipment(Integer equipmentId) {
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
+        return List.copyOf(equipment.getLocations());
+    }
+
+    // Récupérer un lieu par son nom
+    public Optional<Location> findByName(String name) {
+        return locationRepository.findByName(name);
+    }
+
+    // Récupérer toutes les photos d'un lieu
+    public List<LocationPhoto> getPhotosByLocation(Integer locationId) {
+        locationRepository.findById(locationId)
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
         return locationPhotoRepository.findByLocation_LocationId(locationId);
     }
 
+    // Ajouter une photo à un lieu
     public LocationPhoto addPhotoToLocation(Integer locationId, LocationPhoto photo) {
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
         photo.setLocation(location);
         return locationPhotoRepository.save(photo);
     }
 
+    // Supprimer une photo d'un lieu
     public void deletePhotoFromLocation(Integer locationId, Integer photoId) {
         Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("Location not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
 
         LocationPhoto photo = locationPhotoRepository.findById(photoId)
-                .orElseThrow(() -> new RuntimeException("Photo not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Photo not found"));
 
         if (!photo.getLocation().getLocationId().equals(locationId)) {
             throw new RuntimeException("Photo does not belong to this location");
@@ -44,6 +115,4 @@ public class LocationService {
 
         locationPhotoRepository.delete(photo);
     }
-
-    // Autres méthodes pour la gestion des lieux
 }

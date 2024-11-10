@@ -1,19 +1,22 @@
 package org.example.iwa_ms_lieux.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.util.List;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Entity(name="locations")
-@Access(AccessType.FIELD)
+import java.math.BigDecimal;
+import java.util.Set;
+
+@Entity
+@Table(name = "locations")
 public class Location {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer locationId;
 
+    @Column(nullable = false)
     private Integer userId;
+
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Column(precision = 18, scale = 16)
@@ -22,45 +25,107 @@ public class Location {
     @Column(precision = 18, scale = 16)
     private BigDecimal longitude;
 
+    @Column(length = 100)
     private String adresse;
+
+    @Column(length = 100)
     private String ville;
+
+    @Column(length = 100)
     private String codePostal;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LocationPhoto> photos;
+    // Relation avec LocationPhoto
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LocationPhoto> photos;
 
-    public Location() {}
+    // Relation avec Equipment
+    @ManyToMany
+    @JoinTable(
+            name = "location_equipments",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "equipment_id")
+    )
+    private Set<Equipment> equipments;
 
-    public Location(Integer userId, String name, BigDecimal latitude, BigDecimal longitude, String adresse, String ville, String codePostal, String description) {
-        this.userId = userId;
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.adresse = adresse;
-        this.ville = ville;
-        this.codePostal = codePostal;
-        this.description = description;
+    // Getters et Setters
+
+    public Integer getLocationId() {
+        return locationId;
     }
 
-    // Getters and setters
-    public Integer getLocationId() { return locationId; }
-    public Integer getUserId() { return userId; }
-    public void setUserId(Integer userId) { this.userId = userId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public BigDecimal getLatitude() { return latitude; }
     public void setLatitude(BigDecimal latitude) { this.latitude = latitude; }
     public BigDecimal getLongitude() { return longitude; }
     public void setLongitude(BigDecimal longitude) { this.longitude = longitude; }
-    public String getAdresse() { return adresse; }
-    public void setAdresse(String adresse) { this.adresse = adresse; }
-    public String getVille() { return ville; }
-    public void setVille(String ville) { this.ville = ville; }
-    public String getCodePostal() { return codePostal; }
-    public void setCodePostal(String codePostal) { this.codePostal = codePostal; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public String getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(String codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<LocationPhoto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<LocationPhoto> photos) {
+        this.photos = photos;
+    }
+
+    public Set<Equipment> getEquipments() {
+        return equipments;
+    }
+
+    public void setEquipments(Set<Equipment> equipments) {
+        this.equipments = equipments;
+    }
 }
-
-

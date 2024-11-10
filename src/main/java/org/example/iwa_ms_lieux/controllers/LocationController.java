@@ -1,7 +1,9 @@
 package org.example.iwa_ms_lieux.controllers;
 
+import org.example.iwa_ms_lieux.models.Equipment;
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
+import org.example.iwa_ms_lieux.services.LocationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,9 @@ public class LocationController {
     @Autowired
     private LocationRepository locationRepository;
 
+    @Autowired
+    private LocationService locationService;
+
     // Liste tous les lieux
     @GetMapping
     public ResponseEntity<List<Location>> list() {
@@ -30,6 +35,14 @@ public class LocationController {
     public ResponseEntity<Location> get(@PathVariable Integer id) {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found"));
+        return ResponseEntity.ok(location);
+    }
+
+    // Récupérer un lieu par nom
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Location> getByName(@PathVariable String name) {
+        Location location = locationService.findByName(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with name " + name + " not found"));
         return ResponseEntity.ok(location);
     }
 
@@ -56,10 +69,56 @@ public class LocationController {
         Location existingLocation = locationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found"));
 
-        // Copie des propriétés, ignore `locationId` pour ne pas écraser l'ID du lieu existant
-        BeanUtils.copyProperties(location, existingLocation, "locationId");
+        // Copie des propriétés de base sans écraser les relations existantes
+        BeanUtils.copyProperties(location, existingLocation, "locationId", "photos", "equipments");
 
+        // Sauvegarde la mise à jour
         Location updatedLocation = locationRepository.saveAndFlush(existingLocation);
         return ResponseEntity.ok(updatedLocation);
+    }
+
+    // Ajouter un nouvel équipement
+    @PostMapping("/equipments")
+    public ResponseEntity<Equipment> addEquipment(@RequestBody Equipment equipment) {
+        return ResponseEntity.ok(locationService.addEquipment(equipment));
+    }
+
+    // Supprimer un équipement par ID
+    @DeleteMapping("/equipments/{equipmentId}")
+    public ResponseEntity<Void> deleteEquipment(@PathVariable Integer equipmentId) {
+        locationService.deleteEquipment(equipmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Lier un équipement à un lieu
+    @PostMapping("/{locationId}/equipments/{equipmentId}")
+    public ResponseEntity<Void> linkEquipmentToLocation(@PathVariable Integer locationId, @PathVariable Integer equipmentId) {
+        locationService.linkEquipmentToLocation(locationId, equipmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Délier un équipement d'un lieu
+    @DeleteMapping("/{locationId}/equipments/{equipmentId}")
+    public ResponseEntity<Void> unlinkEquipmentFromLocation(@PathVariable Integer locationId, @PathVariable Integer equipmentId) {
+        locationService.unlinkEquipmentFromLocation(locationId, equipmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Récupérer tous les équipements
+    @GetMapping("/equipments")
+    public ResponseEntity<List<Equipment>> getAllEquipments() {
+        return ResponseEntity.ok(locationService.getAllEquipments());
+    }
+
+    // Récupérer les équipements pour un lieu donné
+    @GetMapping("/{locationId}/equipments")
+    public ResponseEntity<List<Equipment>> getEquipmentsByLocation(@PathVariable Integer locationId) {
+        return ResponseEntity.ok(locationService.getEquipmentsByLocation(locationId));
+    }
+
+    // Récupérer les lieux pour un équipement donné
+    @GetMapping("/equipments/{equipmentId}/locations")
+    public ResponseEntity<List<Location>> getLocationsByEquipment(@PathVariable Integer equipmentId) {
+        return ResponseEntity.ok(locationService.getLocationsByEquipment(equipmentId));
     }
 }
