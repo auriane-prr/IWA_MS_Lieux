@@ -25,7 +25,7 @@ public class SearchController {
         return ResponseEntity.ok(locationService.getLocationsByEquipment(equipmentId));
     }
 
-    @GetMapping("/locations/ville/{ville}")
+    @GetMapping("/ville/{ville}")
     public ResponseEntity<List<Location>> searchLocationsByVille(@PathVariable String ville) {
         List<Location> locations = locationService.findLocationsByVille(ville);
         if (locations.isEmpty()) {
