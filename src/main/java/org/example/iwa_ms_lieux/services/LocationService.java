@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.iwa_ms_lieux.repositories.EquipmentRepository;
 import org.example.iwa_ms_lieux.models.Equipment;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -30,17 +29,6 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
-    // Ajouter un nouvel équipement
-    public Equipment addEquipment(Equipment equipment) {
-        return equipmentRepository.save(equipment);
-    }
-
-    // Supprimer un équipement
-    public void deleteEquipment(Integer equipmentId) {
-        Equipment equipment = equipmentRepository.findById(equipmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
-        equipmentRepository.delete(equipment);
-    }
 
     // Lier un équipement à un lieu
     public void linkEquipmentToLocation(Integer locationId, Integer equipmentId) {
@@ -62,17 +50,6 @@ public class LocationService {
         locationRepository.save(location);
     }
 
-    // Récupérer tous les équipements
-    public List<Equipment> getAllEquipments() {
-        return equipmentRepository.findAll();
-    }
-
-    // Récupérer les équipements pour un lieu donné
-    public List<Equipment> getEquipmentsByLocation(Integer locationId) {
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
-        return List.copyOf(location.getEquipments());
-    }
 
     // Récupérer les lieux pour un équipement donné
     public List<Location> getLocationsByEquipment(Integer equipmentId) {
@@ -114,5 +91,10 @@ public class LocationService {
         }
 
         locationPhotoRepository.delete(photo);
+    }
+
+    // Rechercher les lieux par ville
+    public List<Location> findLocationsByVille(String ville) {
+        return locationRepository.findByVilleIgnoreCase(ville);
     }
 }

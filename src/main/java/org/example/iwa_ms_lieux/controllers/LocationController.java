@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 
 @RestController
@@ -77,18 +76,6 @@ public class LocationController {
         return ResponseEntity.ok(updatedLocation);
     }
 
-    // Ajouter un nouvel équipement
-    @PostMapping("/equipments")
-    public ResponseEntity<Equipment> addEquipment(@RequestBody Equipment equipment) {
-        return ResponseEntity.ok(locationService.addEquipment(equipment));
-    }
-
-    // Supprimer un équipement par ID
-    @DeleteMapping("/equipments/{equipmentId}")
-    public ResponseEntity<Void> deleteEquipment(@PathVariable Integer equipmentId) {
-        locationService.deleteEquipment(equipmentId);
-        return ResponseEntity.noContent().build();
-    }
 
     // Lier un équipement à un lieu
     @PostMapping("/{locationId}/equipments/{equipmentId}")
@@ -104,21 +91,5 @@ public class LocationController {
         return ResponseEntity.noContent().build();
     }
 
-    // Récupérer tous les équipements
-    @GetMapping("/equipments")
-    public ResponseEntity<List<Equipment>> getAllEquipments() {
-        return ResponseEntity.ok(locationService.getAllEquipments());
-    }
 
-    // Récupérer les équipements pour un lieu donné
-    @GetMapping("/{locationId}/equipments")
-    public ResponseEntity<List<Equipment>> getEquipmentsByLocation(@PathVariable Integer locationId) {
-        return ResponseEntity.ok(locationService.getEquipmentsByLocation(locationId));
-    }
-
-    // Récupérer les lieux pour un équipement donné
-    @GetMapping("/equipments/{equipmentId}/locations")
-    public ResponseEntity<List<Location>> getLocationsByEquipment(@PathVariable Integer equipmentId) {
-        return ResponseEntity.ok(locationService.getLocationsByEquipment(equipmentId));
-    }
 }
