@@ -6,6 +6,8 @@ import org.example.iwa_ms_lieux.models.LocationPhoto;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
 import org.example.iwa_ms_lieux.repositories.LocationPhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.example.iwa_ms_lieux.repositories.EquipmentRepository;
 import org.example.iwa_ms_lieux.models.Equipment;

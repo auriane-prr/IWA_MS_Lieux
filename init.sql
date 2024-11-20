@@ -8,7 +8,8 @@ CREATE TABLE locations (
                            adresse VARCHAR(100),
                            ville VARCHAR(100),
                            code_postal VARCHAR(100),
-                           description TEXT
+                           description TEXT,
+                           publication_date DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 -- Création de la table location_photos
@@ -32,9 +33,9 @@ CREATE TABLE location_equipments (
 );
 
 -- Insertion de données d'exemple
-INSERT INTO locations (user_id, name, latitude, longitude, adresse, ville, code_postal, description)
+INSERT INTO locations (user_id, name, latitude, longitude, adresse, ville, code_postal, description, publication_date)
 VALUES
-    (1, 'Montpellier Bivouac', 43.6119, 3.8772, '123 Rue de la Paix', 'Montpellier', '34000', 'Un lieu de bivouac agréable à Montpellier');
+    (1, 'Montpellier Bivouac', 43.6119, 3.8772, '123 Rue de la Paix', 'Montpellier', '34000', 'Un lieu de bivouac agréable à Montpellier', CURRENT_DATE);
 
 INSERT INTO equipments (name) VALUES ('Wi-Fi'), ('Electricité'), ('Parking');
 
