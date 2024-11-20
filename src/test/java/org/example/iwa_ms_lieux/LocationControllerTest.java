@@ -130,4 +130,51 @@ public class LocationControllerTest {
                 .andExpect(status().isNoContent());
         Mockito.verify(locationService, Mockito.times(1)).unlinkEquipmentFromLocation(1, 101);
     }
+
+@Test
+    void testGetLocationsByUserId() throws Exception {
+        testLocation.setUserId(101); // Assurez-vous que le userId est défini
+        List<Location> locations = Arrays.asList(testLocation);
+
+        Mockito.when(locationService.findLocationsByUserId(101)).thenReturn(locations);
+
+        mockMvc.perform(get("/locations/user/101"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].locationId").value(1))
+                .andExpect(jsonPath("$[0].name").value("Test Location"))
+                .andExpect(jsonPath("$[0].userId").value(101));
+    }
+
+    @Test
+    void testGetTopThreeRecentLocations() throws Exception {
+        // Créez trois lieux avec des dates de publication différentes
+        Location location1 = new Location();
+        location1.setLocationId(1);
+        location1.setName("Location 1");
+        location1.setPublicationDate(LocalDate.now().minusDays(3)); // Il y a 3 jours
+
+        Location location2 = new Location();
+        location2.setLocationId(2);
+        location2.setName("Location 2");
+        location2.setPublicationDate(LocalDate.now().minusDays(2)); // Il y a 2 jours
+
+        Location location3 = new Location();
+        location3.setLocationId(3);
+        location3.setName("Location 3");
+        location3.setPublicationDate(LocalDate.now().minusDays(1)); // Hier
+
+        // Simulez le service pour renvoyer les trois lieux
+        List<Location> recentLocations = Arrays.asList(location3, location2, location1);
+        Mockito.when(locationService.getThreeMostRecentLocations()).thenReturn(recentLocations);
+
+        // Effectuez une requête GET sur la route des lieux récents
+        mockMvc.perform(get("/locations/recent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(3)) // Vérifiez qu'il y a 3 lieux
+                .andExpect(jsonPath("$[0].locationId").value(3)) // Le plus récent en premier
+                .andExpect(jsonPath("$[1].locationId").value(2))
+                .andExpect(jsonPath("$[2].locationId").value(1));
+    }
+
 }
