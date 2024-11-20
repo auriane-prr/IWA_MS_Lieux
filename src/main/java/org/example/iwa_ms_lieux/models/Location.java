@@ -3,6 +3,7 @@ package org.example.iwa_ms_lieux.models;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -36,6 +37,9 @@ public class Location {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(nullable = false)
+    private LocalDate publicationDate;
 
     // Relation avec LocationPhoto
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -127,5 +131,13 @@ public class Location {
 
     public void setEquipments(Set<Equipment> equipments) {
         this.equipments = equipments;
+    }
+
+    public LocalDate getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(LocalDate publicationDate) {
+        this.publicationDate = publicationDate;
     }
 }
