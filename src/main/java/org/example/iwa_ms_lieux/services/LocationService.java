@@ -97,4 +97,14 @@ public class LocationService {
     public List<Location> findLocationsByVille(String ville) {
         return locationRepository.findByVilleIgnoreCase(ville);
     }
+
+    // Récupérer les lieux par propriétaire (userId)
+    public List<Location> findLocationsByUserId(Integer userId) {
+        return locationRepository.findByUserId(userId);
+    }
+
+    public List<Location> getThreeMostRecentLocations() {
+        Pageable topThree = PageRequest.of(0, 3); // Limiter à 3 résultats
+        return locationRepository.findAllByOrderByPublicationDateDesc(topThree);
+    }
 }
