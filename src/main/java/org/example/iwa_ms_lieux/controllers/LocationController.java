@@ -91,5 +91,24 @@ public class LocationController {
         return ResponseEntity.noContent().build();
     }
 
+    // Récupérer les lieux par propriétaire
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Location>> getLocationsByUserId(@PathVariable Integer userId) {
+        List<Location> locations = locationService.findLocationsByUserId(userId);
+        if (locations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(locations);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<Location>> getThreeMostRecentLocations() {
+        List<Location> locations = locationService.getThreeMostRecentLocations();
+        if (locations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(locations);
+    }
+
 
 }
