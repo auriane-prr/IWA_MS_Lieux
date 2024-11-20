@@ -12,5 +12,12 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     // Rechercher un lieu par son nom
     Optional<Location> findByName(String name);
 
+    // Rechercher des lieux par ville (insensible à la casse)
     List<Location> findByVilleIgnoreCase(String ville);
+
+    // Rechercher des lieux par utilisateur (propriétaire)
+    List<Location> findByUserId(Integer userId);
+
+    // Classe les lieux par date de publication
+    List<Location> findAllByOrderByPublicationDateDesc(Pageable pageable);
 }
