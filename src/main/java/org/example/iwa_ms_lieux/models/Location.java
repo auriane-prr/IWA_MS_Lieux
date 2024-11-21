@@ -38,8 +38,9 @@ public class Location {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private LocalDate publicationDate;
+    @Column(nullable = false, columnDefinition = "DATE DEFAULT CURRENT_DATE")
+    private LocalDate publicationDate = LocalDate.now();
+
 
     // Relation avec LocationPhoto
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)

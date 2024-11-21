@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -48,9 +50,12 @@ public class LocationController {
     // Crée un nouveau lieu
     @PostMapping
     public ResponseEntity<Location> create(@RequestBody Location location) {
+        // Définir explicitement la date de publication pour éviter qu'elle soit remplacée
+        location.setPublicationDate(LocalDate.now());
         Location createdLocation = locationRepository.saveAndFlush(location);
         return new ResponseEntity<>(createdLocation, HttpStatus.CREATED);
     }
+
 
     // Supprime un lieu par ID
     @DeleteMapping("/{id}")
