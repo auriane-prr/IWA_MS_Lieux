@@ -41,12 +41,16 @@ public class Location {
     @Column(nullable = false, columnDefinition = "DATE DEFAULT CURRENT_DATE")
     private LocalDate publicationDate = LocalDate.now();
 
+    // Relation 1:1 avec Photo
+    @OneToOne
+    @JoinTable(
+            name = "location_photos",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "photo_id")
+    )
+    private Photo photo;
 
-    // Relation avec LocationPhoto
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LocationPhoto> photos;
-
-    // Relation avec Equipment
+    // Relation Many-to-Many avec Equipment
     @ManyToMany
     @JoinTable(
             name = "location_equipments",
@@ -81,10 +85,21 @@ public class Location {
         this.name = name;
     }
 
-    public BigDecimal getLatitude() { return latitude; }
-    public void setLatitude(BigDecimal latitude) { this.latitude = latitude; }
-    public BigDecimal getLongitude() { return longitude; }
-    public void setLongitude(BigDecimal longitude) { this.longitude = longitude; }
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
 
     public String getAdresse() {
         return adresse;
@@ -118,12 +133,12 @@ public class Location {
         this.description = description;
     }
 
-    public Set<LocationPhoto> getPhotos() {
-        return photos;
+    public Photo getPhoto() {
+        return photo;
     }
 
-    public void setPhotos(Set<LocationPhoto> photos) {
-        this.photos = photos;
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
     }
 
     public Set<Equipment> getEquipments() {

@@ -4,6 +4,7 @@ import org.example.iwa_ms_lieux.models.Equipment;
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
 import org.example.iwa_ms_lieux.services.LocationService;
+import org.example.iwa_ms_lieux.services.PhotoService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,6 +25,9 @@ public class LocationController {
 
     @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private PhotoService photoService;
 
     // Liste tous les lieux
     @GetMapping
@@ -63,9 +68,20 @@ public class LocationController {
         if (!locationRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found");
         }
+
+        // Supprime la photo associée au lieu
+        try {
+            photoService.deletePhotoByLocationId(Long.valueOf(id));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error deleting photo: " + e.getMessage());
+        }
+
+        // Supprime le lieu
         locationRepository.deleteById(id);
+
         return ResponseEntity.noContent().build();
     }
+
 
     // Met à jour un lieu existant
     @PutMapping("/{id}")

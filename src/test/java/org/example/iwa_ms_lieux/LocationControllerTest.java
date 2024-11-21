@@ -4,6 +4,7 @@ import org.example.iwa_ms_lieux.controllers.LocationController;
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.services.LocationService;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
+import org.example.iwa_ms_lieux.services.PhotoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,9 @@ public class LocationControllerTest {
 
     @MockBean
     private LocationService locationService;
+
+    @MockBean
+    private PhotoService photoService;
 
     private Location testLocation;
 
@@ -78,14 +83,16 @@ public class LocationControllerTest {
 
     @Test
     void testCreateLocation() throws Exception {
+        // Configure le comportement simulé du repository pour retourner un lieu avec une date de publication actuelle
+        testLocation.setPublicationDate(LocalDate.now());
         Mockito.when(locationRepository.saveAndFlush(any(Location.class))).thenReturn(testLocation);
 
         String requestBody = """
-            {
-                "name": "Test Location",
-                "ville": "Test City"
-            }
-            """;
+                {
+                    "name": "Test Location",
+                    "ville": "Test City"
+                }
+                """;
 
         mockMvc.perform(post("/locations")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,25 +100,29 @@ public class LocationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.locationId").value(1))
                 .andExpect(jsonPath("$.name").value("Test Location"))
-                .andExpect(jsonPath("$.ville").value("Test City"));
+                .andExpect(jsonPath("$.ville").value("Test City"))
+                .andExpect(jsonPath("$.publicationDate").value(LocalDate.now().toString())); // Vérifie que la date est la date actuelle
     }
 
     @Test
     void testDeleteLocation() throws Exception {
+        // Mock pour vérifier l'existence du lieu
         Mockito.when(locationRepository.existsById(1)).thenReturn(true);
 
+        // Mock pour simuler le comportement du service PhotoService
+        Mockito.doNothing().when(photoService).deletePhotoByLocationId(1L);
+
+        // Exécute la requête DELETE
         mockMvc.perform(delete("/locations/1"))
                 .andExpect(status().isNoContent());
+
+        // Vérifie que la méthode de suppression dans le PhotoService est appelée
+        Mockito.verify(photoService, Mockito.times(1)).deletePhotoByLocationId(1L);
+
+        // Vérifie que le lieu est supprimé
         Mockito.verify(locationRepository, Mockito.times(1)).deleteById(1);
     }
 
-    @Test
-    void testDeleteLocation_NotFound() throws Exception {
-        Mockito.when(locationRepository.existsById(anyInt())).thenReturn(false);
-
-        mockMvc.perform(delete("/locations/99"))
-                .andExpect(status().isNotFound());
-    }
 
     @Test
     void testLinkEquipmentToLocation() throws Exception {

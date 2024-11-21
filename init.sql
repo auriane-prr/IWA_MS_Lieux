@@ -12,11 +12,19 @@ CREATE TABLE locations (
                            publication_date DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
--- Création de la table location_photos
+-- Table photos
+CREATE TABLE photos (
+                        photo_id SERIAL PRIMARY KEY,
+                        photo_path VARCHAR(255) NOT NULL -- Chemin du fichier sur le disque
+);
+
+
+-- Table de jointure entre locations et photos
 CREATE TABLE location_photos (
-                                 photo_id SERIAL PRIMARY KEY,
-                                 location_id INTEGER NOT NULL REFERENCES locations(location_id),
-                                 photo_url VARCHAR(100) NOT NULL
+                                 location_id INTEGER NOT NULL REFERENCES locations(location_id) ON DELETE CASCADE,
+                                 photo_id INTEGER NOT NULL REFERENCES photos(photo_id) ON DELETE CASCADE,
+                                 PRIMARY KEY (location_id, photo_id),
+                                 UNIQUE (location_id) -- Assure qu'un lieu ne peut avoir qu'une seule photo
 );
 
 -- Création de la table equipments
