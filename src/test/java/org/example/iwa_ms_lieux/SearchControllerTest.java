@@ -1,7 +1,8 @@
-package org.example.iwa_ms_lieux.controllers;
+package org.example.iwa_ms_lieux;
 
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.services.LocationService;
+import org.example.iwa_ms_lieux.controllers.SearchController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
