@@ -90,7 +90,8 @@ public class LocationController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found"));
 
         // Copie des propriétés de base sans écraser les relations existantes
-        BeanUtils.copyProperties(location, existingLocation, "locationId", "photos", "equipments");
+        BeanUtils.copyProperties(location, existingLocation,
+                "locationId", "userId", "publicationDate", "photos", "equipments");
 
         // Sauvegarde la mise à jour
         Location updatedLocation = locationRepository.saveAndFlush(existingLocation);
