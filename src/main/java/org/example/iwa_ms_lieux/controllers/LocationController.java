@@ -99,10 +99,12 @@ public class LocationController {
     }
 
 
-    // Lier un équipement à un lieu
-    @PostMapping("/{locationId}/equipments/{equipmentId}")
-    public ResponseEntity<Void> linkEquipmentToLocation(@PathVariable Integer locationId, @PathVariable Integer equipmentId) {
-        locationService.linkEquipmentToLocation(locationId, equipmentId);
+    // Lier un ou plusieurs équipement à un lieu
+    @PostMapping("/{locationId}/equipments")
+    public ResponseEntity<Void> linkEquipmentsToLocation(
+            @PathVariable Integer locationId,
+            @RequestBody List<Integer> equipmentIds) {
+        locationService.linkEquipmentsToLocation(locationId, equipmentIds);
         return ResponseEntity.noContent().build();
     }
 
