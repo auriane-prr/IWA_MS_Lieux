@@ -28,13 +28,17 @@ public class LocationService {
     }
 
 
-    // Lier un équipement à un lieu
-    public void linkEquipmentToLocation(Integer locationId, Integer equipmentId) {
+    // Lier plusieurs équipements à un lieu
+    public void linkEquipmentsToLocation(Integer locationId, List<Integer> equipmentIds) {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new EntityNotFoundException("Location not found"));
-        Equipment equipment = equipmentRepository.findById(equipmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
-        location.getEquipments().add(equipment);
+
+        List<Equipment> equipments = equipmentRepository.findAllById(equipmentIds);
+        if (equipments.size() != equipmentIds.size()) {
+            throw new EntityNotFoundException("One or more equipments not found");
+        }
+
+        location.getEquipments().addAll(equipments);
         locationRepository.save(location);
     }
 
