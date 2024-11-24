@@ -65,11 +65,11 @@ public class LocationController {
     // Supprime un lieu par ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        if (!locationRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found");
-        }
+        // Vérifie si le lieu existe
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + id + " not found"));
 
-        // Supprime la photo associée au lieu
+        // Supprime la photo associée en utilisant le service
         try {
             photoService.deletePhotoByLocationId(Long.valueOf(id));
         } catch (IOException e) {
@@ -81,6 +81,7 @@ public class LocationController {
 
         return ResponseEntity.noContent().build();
     }
+
 
 
     // Met à jour un lieu existant
