@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -124,13 +126,23 @@ public class LocationControllerTest {
     }
 
 
-    @Test
-    void testLinkEquipmentToLocation() throws Exception {
-        Mockito.doNothing().when(locationService).linkEquipmentToLocation(1, 101);
+   @Test
+    void testLinkEquipmentsToLocation() throws Exception {
+        // Mock des données entrantes
+        List<Integer> equipmentIds = List.of(101, 102, 103);
+        String requestBody = new ObjectMapper().writeValueAsString(equipmentIds);
 
-        mockMvc.perform(post("/locations/1/equipments/101"))
+        // Mock du service
+        Mockito.doNothing().when(locationService).linkEquipmentsToLocation(1, equipmentIds);
+
+        // Exécution de la requête
+        mockMvc.perform(post("/locations/1/equipments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isNoContent());
-        Mockito.verify(locationService, Mockito.times(1)).linkEquipmentToLocation(1, 101);
+
+        // Vérification que le service est appelé avec les bons paramètres
+        Mockito.verify(locationService, Mockito.times(1)).linkEquipmentsToLocation(1, equipmentIds);
     }
 
     @Test
