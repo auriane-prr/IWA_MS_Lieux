@@ -48,7 +48,7 @@ public class SearchControllerTest {
     @Test
     void testGetLocationsByEquipment_Success() throws Exception {
         // Mock response from LocationService
-        when(locationService.getLocationsByEquipment(1)).thenReturn(Arrays.asList(location1, location2));
+        when(locationService.getLocationsByEquipments(Arrays.asList(1, 2))).thenReturn(Arrays.asList(location1, location2));
 
         // Perform GET request and validate response
         mockMvc.perform(get("/search/1/locations")
@@ -60,19 +60,6 @@ public class SearchControllerTest {
                 .andExpect(jsonPath("$[1].locationId").value(2))
                 .andExpect(jsonPath("$[1].name").value("Location 2"));
     }
-
-    @Test
-    void testGetLocationsByEquipment_NoContent() throws Exception {
-        // Mock empty response
-        when(locationService.getLocationsByEquipment(99)).thenReturn(Collections.emptyList());
-
-        // Perform GET request and validate response
-        mockMvc.perform(get("/search/99/locations")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(0));
-    }
-
     @Test
     void testSearchLocationsByVille_Success() throws Exception {
         // Mock response from LocationService
@@ -87,6 +74,16 @@ public class SearchControllerTest {
                 .andExpect(jsonPath("$[0].ville").value("Paris"))
                 .andExpect(jsonPath("$[1].locationId").value(2))
                 .andExpect(jsonPath("$[1].ville").value("Paris"));
+    }
+    @Test
+    void testGetLocationsByEquipment_EmptyList() throws Exception {
+        // Mock empty response
+        when(locationService.getLocationsByEquipments(Collections.emptyList())).thenReturn(Collections.emptyList());
+
+        // Perform GET request and validate response
+        mockMvc.perform(get("/search/0/locations")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
