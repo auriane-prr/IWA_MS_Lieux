@@ -19,11 +19,16 @@ public class SearchController {
     @Autowired
     private LocationService locationService;
 
-    // Récupérer les lieux pour un équipement donné
-    @GetMapping("{equipmentId}/locations")
-    public ResponseEntity<List<Location>> getLocationsByEquipment(@PathVariable Integer equipmentId) {
-        return ResponseEntity.ok(locationService.getLocationsByEquipment(equipmentId));
+// Dans ton contrôleur SearchController
+@GetMapping("/locations")
+public ResponseEntity<List<Location>> getLocationsByEquipments(@RequestParam List<Integer> equipmentIds) {
+    if (equipmentIds.isEmpty()) {
+        return ResponseEntity.badRequest().body(null); // Gestion d'une liste vide
     }
+    List<Location> locations = locationService.getLocationsByEquipments(equipmentIds);
+    return ResponseEntity.ok(locations);
+}
+
 
     @GetMapping("/ville/{ville}")
     public ResponseEntity<List<Location>> searchLocationsByVille(@PathVariable String ville) {

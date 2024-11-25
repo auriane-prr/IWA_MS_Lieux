@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.util.ArrayList;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -119,9 +119,7 @@ public class LocationController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Location>> getLocationsByUserId(@PathVariable Integer userId) {
         List<Location> locations = locationService.findLocationsByUserId(userId);
-        if (locations.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        // Retourne une liste vide au lieu de NO_CONTENT
         return ResponseEntity.ok(locations);
     }
 

@@ -3,13 +3,15 @@ package org.example.iwa_ms_lieux.services;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.iwa_ms_lieux.models.Location;
 import org.example.iwa_ms_lieux.repositories.LocationRepository;
+import java.util.HashSet; // Since you're also using HashSet
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.example.iwa_ms_lieux.repositories.EquipmentRepository;
 import org.example.iwa_ms_lieux.models.Equipment;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,11 +56,13 @@ public class LocationService {
 
 
     // Récupérer les lieux pour un équipement donné
-    public List<Location> getLocationsByEquipment(Integer equipmentId) {
-        Equipment equipment = equipmentRepository.findById(equipmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Equipment not found"));
-        return List.copyOf(equipment.getLocations());
-    }
+public List<Location> getLocationsByEquipments(List<Integer> equipmentIds) {
+    List<Equipment> equipments = equipmentRepository.findAllById(equipmentIds);
+    Set<Location> uniqueLocations = new HashSet<>(); 
+    equipments.forEach(equipment -> uniqueLocations.addAll(equipment.getLocations()));
+    return new ArrayList<>(uniqueLocations);
+}
+
 
     // Récupérer un lieu par son nom
     public Optional<Location> findByName(String name) {
